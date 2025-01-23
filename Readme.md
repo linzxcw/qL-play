@@ -9,7 +9,7 @@
 - **高效传输**：支持高清流媒体传输，确保流畅播放
 - **简单易用**：用户界面友好，操作简便
 - **多浏览器支持**：兼容主流浏览器，如 Chrome、Firefox、Safari 和 Edge
-[phone](./qL-play-wb.jpg)
+ <img src="./qL-play-wb.jpg" border="0">
 ## 安装方法
 ### 先决条件
 - 确保已安装 [Macast](https://github.com/xfangfang/Macast/releases/tag/v0.7)
