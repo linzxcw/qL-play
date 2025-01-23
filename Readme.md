@@ -61,7 +61,7 @@ python qL-player-server.py
 ## 贡献
 欢迎任何形式的贡献！请提交 Pull Request，或提出 Issue。  
 也欢迎开发者请喝杯咖啡，您的支持是我持续更新的动力！
-<img src="./202216.jpg" border="0">
+<img src="./2022166.jpg" border="0">
 ## 致谢
 特别感谢所有为本项目提供帮助和支持的人士。  
 - [Macast](https://github.com/xfangfang/Macast/releases/tag/v0.7)
