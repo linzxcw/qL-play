@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="/static/qltp-logo.ico"/>
+    <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui">
+    <meta name="referrer" content="no-referrer">
+    <title>麒麟投屏</title>
+	<link rel="stylesheet" href="/static/styles2.css"> <!-- 引入CSS文件 -->
+  </head>
+  <body>
+    <div class="header">
+      <img src="/static/qltp-logotxt-black.png" alt="Logo" class="logo" id="logo"> <!-- 默认模式logo -->
+      <div class="header-buttons">
+        <button class="header-button moon-icon" id="darkModeToggle"></button> <!-- 月亮图标按钮 -->
+          <button class="header-button github-icon" id="githubButton"></button> <!-- github图标按钮 -->
+           <button class="header-button quit-icon" id="quitButton"></button> <!-- quit图标按钮 -->
+      </div>
+    </div>
+    <div class="container">
+      <div class="card">
+        <div id="mse"></div>
+      </div>
+      <div class="control-bar">
+        <button class="control-button" id="playPauseButton">播放</button>
+        <button class="control-button" id="pauseButton">暂停</button>
+        <button class="control-button" id="fullscreenButton">全屏</button>
+        <button class="control-button" id="resetButton">重置</button>
+        <button class="control-button" id="disableButton">禁投</button>
+      </div>
+    </div>
+    <link rel="stylesheet" href="/static/index.min.css"/>
+    <script charset="utf-8" src="/static/index.min.js"></script>
+    <script charset="utf-8" src="/static/index.min-hls.js"></script>
+    <script charset="utf-8" src="/static/index.min-flv.js"></script>
+    <script>
+	  document.getElementById("darkModeToggle").onclick = function() {
+                   document.body.classList.toggle("dark-mode"); // 切换dark-mode类
+                   const logo = document.getElementById('logo'); 
+                   if (document.body.classList.contains("dark-mode")) { 
+                        logo.src = "/static/qltp-logotxt.png"; // 暗黑模式logo 
+                   } else { 
+                        logo.src = "/static/qltp-logotxt-black.png"; // 默认模式logo 
+                   } 
+          };
+         document.getElementById("githubButton").onclick = function() { 
+         window.open("https://github.com/linzxcw/qL-play", "_blank"); // 打开新网页
+         };
+         document.getElementById('quitButton').addEventListener('click', function() { 
+         window.close(); 
+        });
+      let currentUrl = ""; // 当前播放的 URL
+      let currentPlayerType = ""; // 当前播放器类型
+      let player; // 播放器实例
+
+      function initializePlayer(url) {
+        const config = {
+          "id": "mse",
+          "url": url,
+          "playsinline": true,
+          "poster": "/static/fengmian.jpg",
+          "plugins": [],
+          "keyShortcut": "off",
+          "closeVideoDblclick": false,
+          "playbackRate": [
+            0.5,
+            1,
+            1.5,
+            2,
+            5,
+            10
+          ],
+          "autoplay": true,
+		  "muted": true, // 静音自动播放
+          "fluid": true,
+          "pip": true
+        };
+
+        if (url.includes(".m3u8") || url.includes("iqiyi.com")) {
+          config.plugins.push(HlsPlayer);
+          currentPlayerType = "hls";
+        } else if (url.endsWith(".flv")) {
+          config.plugins.push(FlvPlayer);
+          currentPlayerType = "flv";
+        } else {
+          currentPlayerType = "default";
+        }
+
+        if (player) {
+          player.destroy(); // 销毁当前播放器实例
+        }
+        player = new Player(config); // 创建新的播放器实例
+            player.on('ready', () => {
+                player.play(); // 自动播放
+            });
+        }
+
+       function fetchVideoUrl() {
+         if (isDisabled) {
+           console.log("禁投模式已开启，停止接收新的URL。");
+           return;
+         }
+
+         fetch('/get_url')
+           .then(response => response.json())
+           .then(data => {
+             const url = data.url || "/static/ql-1.mp4"; // 默认视频 URL
+             let newPlayerType = "";
+
+             if (url.includes(".m3u8") || url.includes("iqiyi.com")) {
+               newPlayerType = "hls";
+             } else if (url.endsWith(".flv")) {
+               newPlayerType = "flv";
+             } else {
+               newPlayerType = "default";
+             }
+
+             if (url !== currentUrl || newPlayerType !== currentPlayerType) {
+               currentUrl = url;
+               initializePlayer(url); // 初始化播放器
+             }
+           });
+       }
+     document.getElementById("playPauseButton").onclick = function() { 
+         if (player && player.paused) { 
+             player.play(); // 仅在视频处于暂停状态时播放 
+        } 
+     };
+    document.getElementById("pauseButton").onclick = function() {
+  if (player && !player.paused) {    
+    player.pause(); // 仅在视频处于播放状态时暂停
+       }
+    };
+      document.getElementById("resetButton").onclick = function() {
+        if (player) {
+          const defaultUrl = "/static/ql-1.mp4";
+          player.src = defaultUrl;
+          player.play(); // 立即播放视频
+          currentUrl = defaultUrl; // 更新当前URL为默认值
+
+          // 发送 POST 请求到后端，更新 URL
+          fetch('/set_url', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url: defaultUrl })
+          }).then(response => {
+            if (response.ok) {
+              console.log("URL 成功更新为默认值");
+            } else {
+              console.error("更新 URL 失败");
+            }
+          });
+        }
+      };
+
+
+let isFullScreen = false; // 自定义全屏标志
+const playerElement = document.getElementById("mse");
+document.getElementById("fullscreenButton").onclick = function() {
+  const fullscreenButton = document.getElementById("fullscreenButton"); 
+  if (!isFullScreen) {
+    playerElement.classList.add("fullscreen-mode");
+    if (playerElement.requestFullscreen) playerElement.requestFullscreen();
+    else if (playerElement.mozRequestFullScreen) playerElement.mozRequestFullScreen(); 
+    else if (playerElement.webkitRequestFullscreen) playerElement.webkitRequestFullscreen(); 
+    else if (playerElement.msRequestFullscreen) playerElement.msRequestFullscreen();
+    fullscreenButton.classList.add("active");
+    isFullScreen = true; 
+  } else {
+    playerElement.classList.remove("fullscreen-mode");
+    if (document.exitFullscreen) document.exitFullscreen(); 
+    else if (document.mozCancelFullScreen) document.mozCancelFullScreen(); 
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); 
+    else if (document.msExitFullscreen) document.msExitFullscreen();
+    fullscreenButton.classList.remove("active");
+    isFullScreen = false;
+  }
+};
+
+function handleNewURL(url) { 
+  if (isFullScreen) { initializePlayer(url); 
+    if (playerElement.requestFullscreen) playerElement.requestFullscreen();
+    else if (playerElement.mozRequestFullScreen) playerElement.mozRequestFullScreen(); 
+    else if (playerElement.webkitRequestFullscreen) playerElement.webkitRequestFullscreen(); 
+    else if (playerElement.msRequestFullscreen) playerElement.msRequestFullscreen();
+    player.src = url; 
+    player.play();
+  } else { player.src = url;
+    player.play();
+  }
+}
+
+// 监听退出全屏事件
+document.addEventListener("fullscreenchange", function() {
+  if (!document.fullscreenElement && isFullScreen) {
+    const fullscreenButton = document.getElementById("fullscreenButton");
+    fullscreenButton.classList.remove("active");
+    isFullScreen = false;
+  }
+});
+document.addEventListener("mozfullscreenchange", function() {
+  if (!document.mozFullScreenElement && isFullScreen) {
+    const fullscreenButton = document.getElementById("fullscreenButton");
+    fullscreenButton.classList.remove("active");
+    isFullScreen = false;
+  }
+});
+document.addEventListener("webkitfullscreenchange", function() {
+  if (!document.webkitFullscreenElement && isFullScreen) {
+    const fullscreenButton = document.getElementById("fullscreenButton");
+    fullscreenButton.classList.remove("active");
+    isFullScreen = false;
+  }
+});
+document.addEventListener("msfullscreenchange", function() {
+  if (!document.msFullscreenElement && isFullScreen) {
+    const fullscreenButton = document.getElementById("fullscreenButton");
+    fullscreenButton.classList.remove("active");
+    isFullScreen = false;
+  }
+});
+let isDisabled = false; // 禁投模式标志
+
+document.getElementById("disableButton").onclick = function() {
+  const disableButton = document.getElementById("disableButton");
+  
+  if (!isDisabled) {
+    disableButton.classList.add("active");
+    isDisabled = true;
+  } else {
+    disableButton.classList.remove("active");
+    isDisabled = false;
+  }
+};
+
+
+
+   // 每隔2秒检查一次URL是否变化
+    window.onload = function() {
+      fetchVideoUrl();
+      setInterval(() => {
+        if (!isDisabled) { // 仅在禁投模式未开启时检查URL变化
+          fetchVideoUrl();
+        }
+       }, 2000);
+     };
+
+    </script>
+  </body>
+</html>
