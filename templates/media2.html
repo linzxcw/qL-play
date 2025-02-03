@@ -55,6 +55,7 @@
       let player; // 播放器实例
       let socket = io();
       let isLocalUpdate = false;
+      let isFrozen = false; // 添加冻结状态标志
 
       socket.on('connect', () => {
         console.log('Connected to server');
@@ -67,6 +68,12 @@
         }
 
         console.log('Received state update:', state);
+
+        // 设置冻结状态
+        isFrozen = true;
+        setTimeout(() => {
+          isFrozen = false;
+        }, 2000); // 2秒后解除冻结
 
         // 如果URL改变，重新初始化播放器
         if (state.url !== currentUrl) {
@@ -150,14 +157,25 @@
       }
 
       function updatePlayerState() {
-        if (!player || isDisabled) return;
+        // 如果处于冻结状态或没有播放器或禁用状态，则不上报
+        if (isFrozen || !player || isDisabled) {
+          console.log('状态上报被阻止:', {
+            isFrozen: isFrozen,
+            hasPlayer: !!player,
+            isDisabled: isDisabled
+          });
+          return;
+        }
 
-        isLocalUpdate = true;
-        socket.emit('state_update', {
+        const state = {
           url: currentUrl,
           isPlaying: !player.paused,
           currentTime: player.currentTime
-        });
+        };
+
+        console.log('正在上报状态:', state);
+        isLocalUpdate = true;
+        socket.emit('state_update', state);
       }
 
       function fetchVideoUrl() {
