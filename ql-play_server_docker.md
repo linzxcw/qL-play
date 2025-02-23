@@ -6,7 +6,7 @@ version: '3'
 services:
   ql-play:
     image: qilinzhu/ql-play_server:latest
-    container_name: ql-play
+    container_name: ql-play_server
     environment:
       - Web_Sever_Ip=127.0.0.1 # 装有麒麟投屏设备的ip或者域名
       - Web_Sever_Prot=5005
