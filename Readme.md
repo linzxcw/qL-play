@@ -78,7 +78,8 @@ docker-compose up -d
 ```bash
 docker run -d --name ql-play --network host -e Web_Sever_Ip=127.0.0.1 -e Web_Sever_Prot=5005 qilinzhu/ql-play:latest
 ```
-### 3.单独运行麒麟投屏推送服务端（可选）
+### 3.麒麟投屏推送服务端docker部署（可选）
+[跳转教程](https://github.com/linzxcw/qL-play/edit/main/ql-play_server_docker.md)
 
 ## 使用方法
 1. 打开浏览器并访问 [http://127.0.0.1:5005](http://127.0.0.1:5005)，docker版打开部署设备的ip地址+端口，如192.168.1.2:5005
