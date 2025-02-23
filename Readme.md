@@ -95,7 +95,6 @@ docker run -d --name ql-play --network host -e Web_Sever_Ip=127.0.0.1 -e Web_Sev
 - [ ] 增加手机控制投屏视频功能
 - [ ] 添加 Bilibili 弹幕投屏功能
 - [ ] 支持 AirPlay 和 Miracast 等镜像投屏
-### 2.docker一行命令运行
 
 ## 贡献
 欢迎任何形式的贡献！请提交 Pull Request，或提出 Issue。  
