@@ -68,7 +68,7 @@ sudo systemctl disable upnp
 ```
 3.查看upnp.server状态
 ```bash
-sudo systemctl status
+sudo systemctl status upnp
 ```
 
 将这个内容保存为 docker-compose.yml 文件后，可以使用以下命令启动容器：
