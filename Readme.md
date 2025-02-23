@@ -79,7 +79,8 @@ docker-compose up -d
 ```bash
 docker run -d --name ql-play --network host -e Web_Sever_Ip=127.0.0.1 -e Web_Sever_Prot=5005 qilinzhu/ql-play:latest
 ```
-### 3.麒麟投屏推送服务端docker部署（可选）
+### 3.麒麟投屏推送服务端docker部署（可选）、
+- 推送服务端是向其他安装了麒麟投屏的设备推送视频，这样被推送设备就不用安装Macast，推送的地址包括内网外都行！
 - [详细教程](https://github.com/linzxcw/qL-play/blob/main/ql-play_server_docker.md)
 
 ## 使用方法
