@@ -13,6 +13,7 @@ services:
     network_mode: host
 ```
 - 注意事项同首页，关闭或禁用upnp服务
+  
 将这个内容保存为 docker-compose.yml 文件后，可以使用以下命令启动容器：
 ```bash
 docker-compose up -d
