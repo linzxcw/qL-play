@@ -43,8 +43,30 @@ python qL-player-server.py
 - 下载对应设备的麒麟投屏应用
 - 双击运行“麒麟投屏”
 
+## docker部署
+### 1.docker compose文件部署，新建docker-compose.yml文件
+```yaml
+version: '3'
+services:
+  ql-play:
+    image: qilinzhu/ql-play:latest
+    container_name: ql-play
+    environment:
+      - Web_Sever_Ip=127.0.0.1
+      - Web_Sever_Prot=5005
+    network_mode: host
+```
+将这个内容保存为 docker-compose.yml 文件后，可以使用以下命令启动容器：
+```bash
+docker-compose up -d
+```
+### 2.docker一行命令运行
+```bash
+docker run -d --name ql-play --network host -e Web_Sever_Ip=127.0.0.1 -e Web_Sever_Prot=5005 qilinzhu/ql-play:latest
+```
+
 ## 使用方法
-1. 打开浏览器并访问 [http://127.0.0.1:5005](http://127.0.0.1:5005)
+1. 打开浏览器并访问 [http://127.0.0.1:5005](http://127.0.0.1:5005)，docker版打开部署设备的ip地址+端口，如192.168.1.2:5005
 2. 在手机上搜索投屏，将视频推送到“macast(xxx)”设备
 3. 开始享受无缝投屏体验
 
