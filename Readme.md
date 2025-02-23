@@ -56,7 +56,20 @@ services:
       - Web_Sever_Prot=5005
     network_mode: host
 ```
-将这个内容保存为 docker-compose.yml 文件后，可以使用以下命令启动容器：
+- 注意：飞牛os系统需要关闭或者禁用upnp服务才能运行,istoreOS、openwrt等系统可以直接运行
+1.停用upnp.server
+```bash
+sudo systemctl stop upnp
+```
+2.禁用upnp.server
+```bash
+sudo systemctl disable upnp
+```
+3.查看upnp.server状态
+```bash
+sudo systemctl status
+```
+4.将这个内容保存为 docker-compose.yml 文件后，可以使用以下命令启动容器：
 ```bash
 docker-compose up -d
 ```
@@ -64,21 +77,41 @@ docker-compose up -d
 ```bash
 docker run -d --name ql-play --network host -e Web_Sever_Ip=127.0.0.1 -e Web_Sever_Prot=5005 qilinzhu/ql-play:latest
 ```
-
+### 3.单独运行麒麟投屏推送服务端（可选）
+- 推送服务端作用是向其他安装了麒麟投屏的设备，推送视频，这样被推送设备就不用安装Macast，推送的地址包括内网外都行！
+### 1.docker compose文件部署，新建docker-compose.yml文件
+```yaml
+version: '3'
+services:
+  ql-play:
+    image: qilinzhu/ql-play_server:latest
+    container_name: ql-play
+    environment:
+      - Web_Sever_Ip=127.0.0.1 # 装有麒麟投屏设备的ip或者域名
+      - Web_Sever_Prot=5005
+    network_mode: host
+```
+- 注意事项同上，关闭或禁用upnp服务
+将这个内容保存为 docker-compose.yml 文件后，可以使用以下命令启动容器：
+```bash
+docker run -d --name ql-play --network host -e Web_Sever_Ip=127.0.0.1 -e Web_Sever_Prot=5005 qilinzhu/ql-play:latest
+```
+- 记得修改正确的ip地址
 ## 使用方法
 1. 打开浏览器并访问 [http://127.0.0.1:5005](http://127.0.0.1:5005)，docker版打开部署设备的ip地址+端口，如192.168.1.2:5005
-2. 在手机上搜索投屏，将视频推送到“macast(xxx)”设备
+2. 在手机上搜索投屏，将视频推送到“macast(xxx)”或“麒麟托盘”设备
 3. 开始享受无缝投屏体验
 
 ## 开发计划
 - [x] 完成第一版应用，支持 Windows
 - [ ] 添加对 Linux 和 macOS 的支持
-- [ ] 提供 Docker 镜像部署
+- [x] 提供 Docker 镜像部署
 - [ ] 增加对直播投屏的支持
 - [ ] 支持自定义端口和播放器名称
 - [ ] 增加手机控制投屏视频功能
 - [ ] 添加 Bilibili 弹幕投屏功能
 - [ ] 支持 AirPlay 和 Miracast 等镜像投屏
+### 2.docker一行命令运行
 
 ## 贡献
 欢迎任何形式的贡献！请提交 Pull Request，或提出 Issue。  
