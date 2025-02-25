@@ -53,8 +53,8 @@ services:
     container_name: ql-play
     restart: always
     environment:
-      - Web_Sever_Ip=127.0.0.1
-      - Web_Sever_Prot=5005
+      - Web_Server_Ip=127.0.0.1
+      - Web_Server_Prot=5005
     network_mode: host
 ```
 - 注意：飞牛os系统需要关闭或者禁用upnp服务才能运行,群晖系统则需关闭ssdp服务，istoreOS、openwrt等系统可以直接运行
@@ -85,7 +85,7 @@ docker-compose up -d
 ```
 ### 2.docker一行命令运行
 ```bash
-docker run -d --name ql-play --network host --restart always -e Web_Sever_Ip=127.0.0.1 -e Web_Sever_Prot=5005 qilinzhu/ql-play:latest
+docker run -d --name ql-play --network host --restart always -e Web_Server_Ip=127.0.0.1 -e Web_Server_Prot=5005 qilinzhu/ql-play:latest
 ```
 ### 3.麒麟投屏推送服务端docker部署（可选）
 - 推送服务端是向其他安装了麒麟投屏的设备，推送视频。
