@@ -56,19 +56,19 @@ services:
       - Web_Sever_Prot=5005
     network_mode: host
 ```
-- 注意：飞牛os系统需要关闭或者禁用upnp服务才能运行,istoreOS、openwrt等系统可以直接运行
+- 注意：飞牛os系统需要关闭或者禁用upnp服务才能运行,群晖系统则需关闭ssdp服务，istoreOS、openwrt等系统可以直接运行
 
-1.停用upnp.server
+1.停用upnp.server（群晖将upnp换成ssdp）
 ```bash
-sudo systemctl stop upnp
+sudo systemctl stop upnp # 群晖系统，请使用：sudo systemctl stop ssdp
 ```
 2.禁用upnp.server
 ```bash
-sudo systemctl disable upnp
+sudo systemctl disable upnp # 群晖系统，请使用：sudo systemctl disable ssdp
 ```
 3.查看upnp.server状态
 ```bash
-sudo systemctl status upnp
+sudo systemctl status upnp # 群晖系统，请使用：sudo systemctl status ssdp
 ```
 4.如果构建不成功，查看哪个进程占用了本地1900端口
 ```bash
