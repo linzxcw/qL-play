@@ -70,6 +70,10 @@ sudo systemctl disable upnp
 ```bash
 sudo systemctl status upnp
 ```
+4.如果构建不成功，查看哪个进程占用了本地1900端口
+```bash
+sudo netstat -tulnp | grep :9000
+```
 
 将这个内容保存为 docker-compose.yml 文件后，可以使用以下命令启动容器：
 ```bash
