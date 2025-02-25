@@ -51,6 +51,7 @@ services:
   ql-play:
     image: qilinzhu/ql-play:latest
     container_name: ql-play
+    restart: always
     environment:
       - Web_Sever_Ip=127.0.0.1
       - Web_Sever_Prot=5005
@@ -84,7 +85,7 @@ docker-compose up -d
 ```
 ### 2.docker一行命令运行
 ```bash
-docker run -d --name ql-play --network host -e Web_Sever_Ip=127.0.0.1 -e Web_Sever_Prot=5005 qilinzhu/ql-play:latest
+docker run -d --name ql-play --network host --restart always -e Web_Sever_Ip=127.0.0.1 -e Web_Sever_Prot=5005 qilinzhu/ql-play:latest
 ```
 ### 3.麒麟投屏推送服务端docker部署（可选）
 - 推送服务端是向其他安装了麒麟投屏的设备，推送视频。
