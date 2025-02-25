@@ -8,8 +8,8 @@ services:
     image: qilinzhu/ql-play_server:latest
     container_name: ql-play_server
     environment:
-      - Web_Sever_Ip=127.0.0.1 # 装有麒麟投屏设备的ip或者域名
-      - Web_Sever_Prot=5005
+      - Web_Server_Ip=127.0.0.1 # 装有麒麟投屏设备的ip或者域名
+      - Web_Server_Prot=5005
     network_mode: host
 ```
 - 注意事项同首页，关闭或禁用upnp服务
@@ -21,6 +21,6 @@ docker-compose up -d
 
 ### 2.docker一行命令运行
 ```bash
-docker run -d --name ql-play --network host -e Web_Sever_Ip=127.0.0.1 -e Web_Sever_Prot=5005 qilinzhu/ql-play:latest
+docker run -d --name ql-play --network host -e Web_Server_Ip=127.0.0.1 -e Web_Server_Prot=5005 qilinzhu/ql-play:latest
 ```
 - 记得修改正确的ip地址
