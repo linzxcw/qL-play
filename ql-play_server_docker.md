@@ -21,6 +21,6 @@ docker-compose up -d
 
 ### 2.docker一行命令运行
 ```bash
-docker run -d --name ql-play --network host -e Web_Server_Ip=127.0.0.1 -e Web_Server_Prot=5005 qilinzhu/ql-play:latest
+docker run -d --name ql-play --network host -e Web_Server_Ip=127.0.0.1 -e Web_Server_Port=5005 qilinzhu/ql-play:latest
 ```
 - 记得修改正确的ip地址
