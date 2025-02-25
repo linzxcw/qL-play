@@ -9,7 +9,7 @@ services:
     container_name: ql-play_server
     environment:
       - Web_Server_Ip=127.0.0.1 # 装有麒麟投屏设备的ip或者域名
-      - Web_Server_Prot=5005
+      - Web_Server_Port=5005
     network_mode: host
 ```
 - 注意事项同首页，关闭或禁用upnp服务
