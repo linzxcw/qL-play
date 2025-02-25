@@ -60,15 +60,18 @@ services:
 
 1.停用upnp.server（群晖将upnp换成ssdp）
 ```bash
-sudo systemctl stop upnp # 群晖系统，请使用：sudo systemctl stop ssdp
+sudo systemctl stop upnp
+#群晖系统使用：sudo systemctl stop ssdp
 ```
 2.禁用upnp.server
 ```bash
-sudo systemctl disable upnp # 群晖系统，请使用：sudo systemctl disable ssdp
+sudo systemctl disable upnp
+#群晖系统使用：sudo systemctl disable ssdp
 ```
 3.查看upnp.server状态
 ```bash
-sudo systemctl status upnp # 群晖系统，请使用：sudo systemctl status ssdp
+sudo systemctl status upnp
+#群晖系统使用：sudo systemctl status ssdp
 ```
 4.如果构建不成功，查看哪个进程占用了本地1900端口
 ```bash
