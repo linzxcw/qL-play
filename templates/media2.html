@@ -79,9 +79,10 @@
         if (url.includes(".m3u8") || url.includes("iqiyi.com")) {
           config.plugins.push(HlsPlayer);
           currentPlayerType = "hls";
-        } else if (url.endsWith(".flv")) {
+        } else if (url.includes(".flv")) {
           config.plugins.push(FlvPlayer);
           currentPlayerType = "flv";
+          url = url.replace(/^http(s?):/, ""); // 去除.flv URL的http:
         } else {
           currentPlayerType = "default";
         }
@@ -104,13 +105,14 @@
          fetch('/get_url')
            .then(response => response.json())
            .then(data => {
-             const url = data.url || "/static/ql-1.mp4"; // 默认视频 URL
+             let url = data.url || "/static/ql-1.mp4"; // 默认视频 URL
              let newPlayerType = "";
 
              if (url.includes(".m3u8") || url.includes("iqiyi.com")) {
                newPlayerType = "hls";
-             } else if (url.endsWith(".flv")) {
+             } else if (url.includes(".flv")) {
                newPlayerType = "flv";
+               url = url.replace(/^http(s?):/, ""); // 去除.flv URL的http:
              } else {
                newPlayerType = "default";
              }
