@@ -11,9 +11,13 @@ from PIL import Image
 from flask import Flask, render_template, request, jsonify
 from logging.handlers import RotatingFileHandler
 
+# 获取程序所在目录
+program_dir = os.path.dirname(os.path.abspath(__file__))
+log_file = os.path.join(program_dir, 'app.log')
+
 # 设置日志记录
 log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-log_handler = RotatingFileHandler('app.log', maxBytes=100000, backupCount=1)
+log_handler = RotatingFileHandler(log_file, maxBytes=100000, backupCount=1)
 log_handler.setFormatter(log_formatter)
 log_handler.setLevel(logging.DEBUG)
 
