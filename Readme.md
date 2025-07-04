@@ -95,7 +95,7 @@ docker run -d --name ql-play --network host --restart always -e Web_Server_Ip=12
 
 ## 使用方法
 1. 打开浏览器并访问 [http://127.0.0.1:5005](http://127.0.0.1:5005)，docker版打开部署设备的ip地址+端口，如192.168.1.2:5005
-2. 在手机上搜索投屏，将视频推送到“macast(xxx)”或“麒麟托盘”设备
+2. 在手机上搜索投屏，将视频推送到“macast(xxx)”或“麒麟投屏”设备
 3. 开始享受无缝投屏体验
 
 ## 开发计划
