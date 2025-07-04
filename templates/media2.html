@@ -7,6 +7,7 @@
     <meta name="referrer" content="no-referrer">
     <title>麒麟投屏</title>
 	<link rel="stylesheet" href="/static/styles2.css"> <!-- 引入CSS文件 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
   </head>
   <body>
     <div class="header">
@@ -36,22 +37,65 @@
     <script>
 	  document.getElementById("darkModeToggle").onclick = function() {
                    document.body.classList.toggle("dark-mode"); // 切换dark-mode类
-                   const logo = document.getElementById('logo'); 
-                   if (document.body.classList.contains("dark-mode")) { 
-                        logo.src = "/static/qltp-logotxt.png"; // 暗黑模式logo 
-                   } else { 
-                        logo.src = "/static/qltp-logotxt-black.png"; // 默认模式logo 
-                   } 
+                   const logo = document.getElementById('logo');
+                   if (document.body.classList.contains("dark-mode")) {
+                        logo.src = "/static/qltp-logotxt.png"; // 暗黑模式logo
+                   } else {
+                        logo.src = "/static/qltp-logotxt-black.png"; // 默认模式logo
+                   }
           };
-         document.getElementById("githubButton").onclick = function() { 
+         document.getElementById("githubButton").onclick = function() {
          window.open("https://github.com/linzxcw/qL-play", "_blank"); // 打开新网页
          };
-         document.getElementById('quitButton').addEventListener('click', function() { 
-         window.close(); 
+         document.getElementById('quitButton').addEventListener('click', function() {
+         window.close();
         });
       let currentUrl = ""; // 当前播放的 URL
       let currentPlayerType = ""; // 当前播放器类型
       let player; // 播放器实例
+      let socket = io();
+      let isLocalUpdate = false;
+      let isFrozen = false; // 添加冻结状态标志
+
+      socket.on('connect', () => {
+        console.log('Connected to server');
+      });
+
+      socket.on('video_state_update', (state) => {
+        if (isLocalUpdate) {
+          isLocalUpdate = false;
+          return;
+        }
+
+        console.log('Received state update:', state);
+
+        // 设置冻结状态
+        isFrozen = true;
+        setTimeout(() => {
+          isFrozen = false;
+        }, 2000); // 2秒后解除冻结
+
+        // 如果URL改变，重新初始化播放器
+        if (state.url !== currentUrl) {
+          currentUrl = state.url;
+          initializePlayer(state.url);
+        }
+
+        // 同步播放状态
+        if (player) {
+          // 设置播放位置
+          if (Math.abs(player.currentTime - state.currentTime) > 1) {
+            player.currentTime = state.currentTime;
+          }
+
+          // 同步播放/暂停状态
+          if (state.isPlaying && player.paused) {
+            player.play();
+          } else if (!state.isPlaying && !player.paused) {
+            player.pause();
+          }
+        }
+      });
 
       function initializePlayer(url) {
         const config = {
@@ -94,9 +138,48 @@
             player.on('ready', () => {
                 player.play(); // 自动播放
             });
+
+        // 添加播放器事件监听
+        player.on('play', () => {
+          updatePlayerState();
+        });
+
+        player.on('pause', () => {
+          updatePlayerState();
+        });
+
+        player.on('timeupdate', () => {
+          updatePlayerState();
+        });
+
+        player.on('seeking', () => {
+          updatePlayerState();
+        });
+      }
+
+      function updatePlayerState() {
+        // 如果处于冻结状态或没有播放器或禁用状态，则不上报
+        if (isFrozen || !player || isDisabled) {
+          console.log('状态上报被阻止:', {
+            isFrozen: isFrozen,
+            hasPlayer: !!player,
+            isDisabled: isDisabled
+          });
+          return;
         }
 
-       function fetchVideoUrl() {
+        const state = {
+          url: currentUrl,
+          isPlaying: !player.paused,
+          currentTime: player.currentTime
+        };
+
+        console.log('正在上报状态:', state);
+        isLocalUpdate = true;
+        socket.emit('state_update', state);
+      }
+
+      function fetchVideoUrl() {
          if (isDisabled) {
            console.log("禁投模式已开启，停止接收新的URL。");
            return;
@@ -123,13 +206,13 @@
              }
            });
        }
-     document.getElementById("playPauseButton").onclick = function() { 
-         if (player && player.paused) { 
-             player.play(); // 仅在视频处于暂停状态时播放 
-        } 
+     document.getElementById("playPauseButton").onclick = function() {
+         if (player) {
+             player.play(); // 仅在视频处于暂停状态时播放
+        }
      };
     document.getElementById("pauseButton").onclick = function() {
-  if (player && !player.paused) {    
+  if (player) {
     player.pause(); // 仅在视频处于播放状态时暂停
        }
     };
@@ -161,33 +244,33 @@
 let isFullScreen = false; // 自定义全屏标志
 const playerElement = document.getElementById("mse");
 document.getElementById("fullscreenButton").onclick = function() {
-  const fullscreenButton = document.getElementById("fullscreenButton"); 
+  const fullscreenButton = document.getElementById("fullscreenButton");
   if (!isFullScreen) {
     playerElement.classList.add("fullscreen-mode");
     if (playerElement.requestFullscreen) playerElement.requestFullscreen();
-    else if (playerElement.mozRequestFullScreen) playerElement.mozRequestFullScreen(); 
-    else if (playerElement.webkitRequestFullscreen) playerElement.webkitRequestFullscreen(); 
+    else if (playerElement.mozRequestFullScreen) playerElement.mozRequestFullScreen();
+    else if (playerElement.webkitRequestFullscreen) playerElement.webkitRequestFullscreen();
     else if (playerElement.msRequestFullscreen) playerElement.msRequestFullscreen();
     fullscreenButton.classList.add("active");
-    isFullScreen = true; 
+    isFullScreen = true;
   } else {
     playerElement.classList.remove("fullscreen-mode");
-    if (document.exitFullscreen) document.exitFullscreen(); 
-    else if (document.mozCancelFullScreen) document.mozCancelFullScreen(); 
-    else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); 
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     else if (document.msExitFullscreen) document.msExitFullscreen();
     fullscreenButton.classList.remove("active");
     isFullScreen = false;
   }
 };
 
-function handleNewURL(url) { 
-  if (isFullScreen) { initializePlayer(url); 
+function handleNewURL(url) {
+  if (isFullScreen) { initializePlayer(url);
     if (playerElement.requestFullscreen) playerElement.requestFullscreen();
-    else if (playerElement.mozRequestFullScreen) playerElement.mozRequestFullScreen(); 
-    else if (playerElement.webkitRequestFullscreen) playerElement.webkitRequestFullscreen(); 
+    else if (playerElement.mozRequestFullScreen) playerElement.mozRequestFullScreen();
+    else if (playerElement.webkitRequestFullscreen) playerElement.webkitRequestFullscreen();
     else if (playerElement.msRequestFullscreen) playerElement.msRequestFullscreen();
-    player.src = url; 
+    player.src = url;
     player.play();
   } else { player.src = url;
     player.play();
@@ -227,7 +310,7 @@ let isDisabled = false; // 禁投模式标志
 
 document.getElementById("disableButton").onclick = function() {
   const disableButton = document.getElementById("disableButton");
-  
+
   if (!isDisabled) {
     disableButton.classList.add("active");
     isDisabled = true;
