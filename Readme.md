@@ -100,7 +100,7 @@ docker run -d --name ql-play --network host --restart always -e Web_Server_Ip=12
 
 ## 开发计划
 - [x] 完成第一版应用，支持 Windows
-- [ ] 添加对 Linux 和 macOS 的支持
+- [x] 添加对 Linux 和 macOS 的支持
 - [x] 提供 Docker 镜像部署
 - [x] 增加对直播投屏的支持
 - [ ] 支持自定义端口和播放器名称
